@@ -1,0 +1,74 @@
+** Drc report for ACF_Flyback.kicad_pcb **
+** Created on 2026-11-10T20:09:21 **
+** Report includes: Errors, Warnings, Exclusions **
+
+** Found 14 DRC violations **
+[silk_edge_clearance]: Silkscreen clipped by board edge
+    Rule: board setup constraints silk; warning
+    @(30.0000 mm, 30.0000 mm): Rectangle on Edge.Cuts
+    @(30.5800 mm, 42.0000 mm): Polygon of J1 on F.Silkscreen
+[silk_edge_clearance]: Silkscreen clipped by board edge
+    Rule: board setup constraints silk; warning
+    @(129.2000 mm, 88.0000 mm): Rectangle on Edge.Cuts
+    @(130.0000 mm, 88.2500 mm): Reference field of C13
+[silk_edge_clearance]: Silkscreen clipped by board edge
+    Rule: board setup constraints silk; warning
+    @(129.2000 mm, 88.0000 mm): Rectangle on Edge.Cuts
+    @(124.3800 mm, 89.3800 mm): Segment of C13 on F.Silkscreen
+[silk_edge_clearance]: Silkscreen clipped by board edge
+    Rule: board setup constraints silk; warning
+    @(129.2000 mm, 88.0000 mm): Rectangle on Edge.Cuts
+    @(135.6200 mm, 94.6200 mm): Segment of C13 on F.Silkscreen
+[silk_edge_clearance]: Silkscreen clipped by board edge
+    Rule: board setup constraints silk; warning
+    @(129.2000 mm, 46.0000 mm): Rectangle on Edge.Cuts
+    @(111.1700 mm, 83.7700 mm): Segment of T1 on F.Silkscreen
+[silk_edge_clearance]: Silkscreen clipped by board edge
+    Rule: board setup constraints silk; warning
+    @(129.2000 mm, 46.0000 mm): Rectangle on Edge.Cuts
+    @(148.2300 mm, 46.7100 mm): Segment of T1 on F.Silkscreen
+[silk_edge_clearance]: Silkscreen clipped by board edge
+    Rule: board setup constraints silk; warning
+    @(129.2000 mm, 88.0000 mm): Rectangle on Edge.Cuts
+    @(130.1200 mm, 110.3300 mm): Reference field of U3
+[silk_edge_clearance]: Silkscreen clipped by board edge
+    Rule: board setup constraints silk; warning
+    @(129.2000 mm, 88.0000 mm): Rectangle on Edge.Cuts
+    @(133.3550 mm, 104.1300 mm): Segment of U3 on F.Silkscreen
+[silk_edge_clearance]: Silkscreen clipped by board edge
+    Rule: board setup constraints silk; warning
+    @(129.2000 mm, 88.0000 mm): Rectangle on Edge.Cuts
+    @(130.1200 mm, 109.3300 mm): Arc of U3 on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: board setup constraints silk; warning
+    @(82.3800 mm, 71.6200 mm): Segment of C3 on F.Silkscreen
+    @(82.9000 mm, 44.5000 mm): Reference field of C1
+[silk_overlap]: Silkscreen clearance
+    Rule: board setup constraints silk; warning
+    @(39.0000 mm, 111.6200 mm): Reference field of J3
+    @(38.2887 mm, 111.4100 mm): Segment of C12 on F.Silkscreen
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(88.4800 mm, 94.5000 mm): Reference field of C5
+    @(88.9375 mm, 96.5000 mm): Pad 1 [PGND] of R1 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(100.2700 mm, 88.5800 mm): Reference field of D2
+    @(102.3500 mm, 88.1900 mm): Pad 1 [G1] of Q1 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(100.2700 mm, 88.5800 mm): Reference field of D2
+    @(102.3500 mm, 89.4600 mm): Pad 2 [CS] of Q1 on F.Cu
+
+** Found 0 unconnected pads **
+
+** Found 0 Footprint errors **
+
+** Ignored checks **
+    - Footprint has no courtyard defined
+    - Track endpoint not centered on via
+    - Tuning profile track geometries
+    - Footprint doesn't match symbol's footprint filters
+    - Footprint component type doesn't match footprint pads
+
+** End of Report **
