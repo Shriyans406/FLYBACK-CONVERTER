@@ -61,6 +61,10 @@ two_pin("D", "D", line([(-1.27, -1.27), (1.27, -1.27), (0, 1.27), (-1.27, -1.27)
         + line([(0, 2.54), (0, 1.27)]) + line([(0, -2.54), (0, -1.27)]))          # pin 1 = cathode (top)
 two_pin("F", "F", '(rectangle (start -0.762 -2.54) (end 0.762 2.54) (stroke (width 0.254) (type default)) (fill (type none)))'
         + line([(0, 2.54), (0, -2.54)]))
+two_pin("LED", "D", line([(-1.27, -1.27), (1.27, -1.27), (0, 1.27), (-1.27, -1.27)]) + line([(-1.27, 1.27), (1.27, 1.27)])
+        + line([(0, 2.54), (0, 1.27)]) + line([(0, -2.54), (0, -1.27)]) + line([(1.6, 0.2), (2.8, 1.4)]) + line([(1.6, -0.9), (2.8, 0.3)]))
+SYMS["TESTPOINT"] = dict(prefix="TP", hide_names=True, plen=1.27, pins=[("1", "~", 0, 3.81, 270)],
+                         graphics='(circle (center 0 1.27) (radius 1.27) (stroke (width 0.254) (type default)) (fill (type none)))')
 box("CONN2", "J", [("1", "1"), ("2", "2")], [], 10.16)
 box("SiC_MOSFET_7pin", "Q", [("1", "G"), ("2", "KS")], [("8", "D")] + [(str(i), "S") for i in range(3, 8)])
 box("LM5025", "U", [("1", "VIN"), ("2", "RAMP"), ("3", "CS1"), ("4", "CS2"), ("5", "TIME"), ("6", "REF"), ("7", "VCC"), ("8", "OUT_A")],
@@ -93,7 +97,7 @@ def sym_def(name, lib_prefix):
 
 SYM_OF = {"R": "R", "C": "C", "NT": "NET_TIE", "F": "F", "J": "CONN2", "Q": "SiC_MOSFET_7pin", "T": "XFMR_ETD"}
 SPECIAL = {"U1": "LM5025", "U2": "UCC5350S", "U3": "OPTO", "U4": "TL431", "D1": "SCHOTTKY_TO263", "D2": "D",
-           "C1": "CP", "C14": "CP"}
+           "C1": "CP", "C14": "CP", "D3": "LED", "D4": "LED", "D5": "LED"}
 
 
 def symbol_for(ref):
@@ -101,6 +105,8 @@ def symbol_for(ref):
         return SPECIAL[ref]
     if ref.startswith("NT"):
         return "NET_TIE"
+    if ref.startswith("TP"):
+        return "TESTPOINT"
     return SYM_OF[ref.rstrip("0123456789")]
 
 
@@ -114,6 +120,8 @@ GROUPS = [
       "R10", "R11", "R12", "R13", "R14", "R15"]),
     ("5. Secondary rectifier and output filter", 430, 230, ["D1", "J2", "C14", "C15"]),
     ("6. Isolated feedback: TL431 + optocoupler, Y capacitor", 430, 350, ["U3", "U4", "C13", "R18", "R19", "R20", "R21", "R22", "R23", "C16"]),
+    ("7. Usability: status LEDs (HV live, bias, output on) and probe test points", 25, 440,
+     ["R26", "R27", "R28", "D3", "R25", "D4", "R24", "D5", "TP1", "TP2", "TP3", "TP4", "TP5", "TP6"]),
 ]
 out = []
 nc = []
@@ -168,7 +176,8 @@ for title, gx, gy, refs in GROUPS:
     y = gy + 30 + rowh / 2 + 40
     for i, r in enumerate(small):
         lib, fp, value, a, px, py, rot, padnets, desc = D.PARTS[r]
-        place(r, g(gx + 15 + (i % 14) * 25.4), g(y + (i // 14) * 50.8), value, f"{lib}:{fp}", desc, padnets)
+        place(r, g(gx + 15 + (i % 14) * 25.4), g(y + (i // 14) * 50.8), value, f"{lib}:{fp}", desc, padnets,
+              in_bom=not fp.startswith("TestPoint_Pad"))   # bare copper pads are not purchasable parts
 for i in range(4):
     place(f"H{i+1}", g(760 + i * 12.7), g(560), "M3", "MountingHole:MountingHole_3.2mm_M3", "mounting hole", {}, in_bom=False)
 

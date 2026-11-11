@@ -46,3 +46,12 @@ Qty,References,Value,Footprint,Description
 1,R22,10k,R_0805_2012Metric,feedback divider bottom
 1,C16,100n,C_0805_2012Metric,Type-II compensation
 1,R23,10k,R_0805_2012Metric,Type-II compensation
+3,R26 R27 R28,220k,R_1206_3216Metric,HV-live LED dropper
+1,D3,RED,LED_0805_2012Metric,HV LIVE indicator (bulk capacitor charged)
+1,R25,4k7,R_0805_2012Metric,bias LED resistor
+1,D4,YELLOW,LED_0805_2012Metric,12 V BIAS indicator
+1,R24,27k,R_1206_3216Metric,output LED resistor
+1,D5,GREEN,LED_0805_2012Metric,OUTPUT ON indicator
+1,TP1,VOUT,TestPoint_Loop_D2.50mm_Drill1.0mm,"probe loop, +54 V output"
+1,TP2,SGND,TestPoint_Loop_D2.50mm_Drill1.0mm,"probe loop, output return"
+1,TP4,PGND,TestPoint_Loop_D2.50mm_Drill1.0mm,"probe loop, primary ground"

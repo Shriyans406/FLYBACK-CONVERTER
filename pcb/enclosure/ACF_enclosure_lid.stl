@@ -1,0 +1,86 @@
+solid ACF_enclosure_lid.stl
+ facet normal 0 0 0
+  outer loop
+   vertex -4.000 -104.000 38.000
+   vertex -4.000 4.000 38.000
+   vertex 159.000 4.000 38.000
+  endloop
+ endfacet
+ facet normal 0 0 0
+  outer loop
+   vertex -4.000 -104.000 38.000
+   vertex 159.000 4.000 38.000
+   vertex 159.000 -104.000 38.000
+  endloop
+ endfacet
+ facet normal 0 0 0
+  outer loop
+   vertex -4.000 -104.000 40.500
+   vertex 159.000 -104.000 40.500
+   vertex 159.000 4.000 40.500
+  endloop
+ endfacet
+ facet normal 0 0 0
+  outer loop
+   vertex -4.000 -104.000 40.500
+   vertex 159.000 4.000 40.500
+   vertex -4.000 4.000 40.500
+  endloop
+ endfacet
+ facet normal 0 0 0
+  outer loop
+   vertex -4.000 -104.000 38.000
+   vertex 159.000 -104.000 38.000
+   vertex 159.000 -104.000 40.500
+  endloop
+ endfacet
+ facet normal 0 0 0
+  outer loop
+   vertex -4.000 -104.000 38.000
+   vertex 159.000 -104.000 40.500
+   vertex -4.000 -104.000 40.500
+  endloop
+ endfacet
+ facet normal 0 0 0
+  outer loop
+   vertex 159.000 -104.000 38.000
+   vertex 159.000 4.000 38.000
+   vertex 159.000 4.000 40.500
+  endloop
+ endfacet
+ facet normal 0 0 0
+  outer loop
+   vertex 159.000 -104.000 38.000
+   vertex 159.000 4.000 40.500
+   vertex 159.000 -104.000 40.500
+  endloop
+ endfacet
+ facet normal 0 0 0
+  outer loop
+   vertex 159.000 4.000 38.000
+   vertex -4.000 4.000 38.000
+   vertex -4.000 4.000 40.500
+  endloop
+ endfacet
+ facet normal 0 0 0
+  outer loop
+   vertex 159.000 4.000 38.000
+   vertex -4.000 4.000 40.500
+   vertex 159.000 4.000 40.500
+  endloop
+ endfacet
+ facet normal 0 0 0
+  outer loop
+   vertex -4.000 4.000 38.000
+   vertex -4.000 -104.000 38.000
+   vertex -4.000 -104.000 40.500
+  endloop
+ endfacet
+ facet normal 0 0 0
+  outer loop
+   vertex -4.000 4.000 38.000
+   vertex -4.000 -104.000 40.500
+   vertex -4.000 4.000 40.500
+  endloop
+ endfacet
+endsolid ACF_enclosure_lid.stl

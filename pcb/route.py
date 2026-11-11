@@ -77,7 +77,7 @@ def rect_cells(r, shrink=0.1):
 
 def pad_cells(o):
     r = o["rect"]
-    return rect_cells(r, 0.2 * min(r[2] - r[0], r[3] - r[1]) if o["pad"]["tht"] else 0.1)
+    return rect_cells(r, 0.2 * min(r[2] - r[0], r[3] - r[1]) if (o["pad"]["tht"] or o["pad"]["ref"].startswith("TP")) else 0.1)
 
 
 def dist_rect(px, py, r):

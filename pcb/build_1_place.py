@@ -30,8 +30,10 @@ def rect(x0, y0, x1, y1, layer, width=0.1):
     board.Add(s)
 
 
-def text(s, x, y, size=1.5, layer=pcbnew.F_SilkS, rot=0):
+def text(s, x, y, size=1.5, layer=pcbnew.F_SilkS, rot=0, just="C"):
     t = pcbnew.PCB_TEXT(board)
+    if just == "L":
+        t.SetHorizJustify(pcbnew.GR_TEXT_H_ALIGN_LEFT)
     t.SetText(s); t.SetPosition(P(x, y)); t.SetLayer(layer)
     t.SetTextSize(pcbnew.VECTOR2I(mm(size), mm(size))); t.SetTextThickness(mm(size * 0.15))
     if rot:
@@ -40,7 +42,23 @@ def text(s, x, y, size=1.5, layer=pcbnew.F_SilkS, rot=0):
 
 
 # outline + isolation slots
-rect(0, 0, D.BOARD_W, D.BOARD_H, pcbnew.Edge_Cuts)
+def seg(x0, y0, x1, y1, layer=pcbnew.Edge_Cuts):
+    s = pcbnew.PCB_SHAPE(board)
+    s.SetShape(pcbnew.SHAPE_T_SEGMENT); s.SetStart(P(x0, y0)); s.SetEnd(P(x1, y1)); s.SetLayer(layer); s.SetWidth(mm(0.1))
+    board.Add(s)
+
+
+def arc(sx, sy, mx, my, ex, ey):
+    s = pcbnew.PCB_SHAPE(board)
+    s.SetShape(pcbnew.SHAPE_T_ARC); s.SetArcGeometry(P(sx, sy), P(mx, my), P(ex, ey)); s.SetLayer(pcbnew.Edge_Cuts); s.SetWidth(mm(0.1))
+    board.Add(s)
+
+
+W_, H_, R_ = D.BOARD_W, D.BOARD_H, D.CORNER_R
+k = R_ * (1 - 0.70710678)                      # arc mid-point offset from the corner
+seg(R_, 0, W_ - R_, 0); seg(W_, R_, W_, H_ - R_); seg(W_ - R_, H_, R_, H_); seg(0, H_ - R_, 0, R_)
+arc(0, R_, k, k, R_, 0); arc(W_ - R_, 0, W_ - k, k, W_, R_)
+arc(W_, H_ - R_, W_ - k, H_ - k, W_ - R_, H_); arc(R_, H_, k, H_ - k, 0, H_ - R_)
 for s in D.SLOTS:
     rect(*s, pcbnew.Edge_Cuts)
 
@@ -89,6 +107,35 @@ for i, (hx, hy) in enumerate(D.HOLES):
     fp.SetPath(pcbnew.KIID_PATH("/" + D.sym_uuid(f"H{i+1}")))
     fp.SetFPIDAsString("MountingHole:MountingHole_3.2mm_M3")
     fp.SetField("Description", "mounting hole")
+    board.Add(fp)
+
+# ---- board-only items: fiducials, legends, enclosure ----
+BOARD_ONLY = pcbnew.FP_BOARD_ONLY | pcbnew.FP_EXCLUDE_FROM_BOM | pcbnew.FP_EXCLUDE_FROM_POS_FILES
+for i, (fx, fy) in enumerate(D.FIDUCIALS):
+    fp = pcbnew.FootprintLoad(os.path.join(LIBS, "Fiducial.pretty"), "Fiducial_1mm_Mask2mm")
+    fp.SetReference(f"FID{i+1}"); fp.SetValue("Fiducial"); fp.SetPosition(P(fx, fy)); fp.SetAttributes(BOARD_ONLY)
+    fp.Reference().SetVisible(False)
+    board.Add(fp)
+    # router keep-out = the 2 mm solder-mask opening around the fiducial dot
+    pads_out.append(dict(ref=f"FID{i+1}", num="", net=None, tht=False, x0=fx - 1.0, y0=fy - 1.0, x1=fx + 1.0, y1=fy + 1.0))
+for s_, x_, y_, sz_, j_ in D.SILK:
+    text(s_, x_, y_, sz_, just=j_)
+
+E = D.ENC
+m_ = E["gap"]
+rect(-m_, -m_, D.BOARD_W + m_, D.BOARD_H + m_, pcbnew.Dwgs_User)
+rect(-m_ - E["wall"], -m_ - E["wall"], D.BOARD_W + m_ + E["wall"], D.BOARD_H + m_ + E["wall"], pcbnew.Dwgs_User)
+text("ENCLOSURE OUTLINE (inner / outer wall) - 3D model in enclosure/", D.BOARD_W / 2, -m_ - E["wall"] - 2, 1.2, layer=pcbnew.Dwgs_User)
+for ref_, fname, show in (("ENC1", "ACF_enclosure_base.wrl", True), ("ENC2", "ACF_enclosure_lid.wrl", False)):
+    fp = pcbnew.FOOTPRINT(board)
+    fp.SetReference(ref_); fp.SetValue("Enclosure base" if show else "Enclosure lid")
+    fp.SetPosition(P(0, 0)); fp.SetAttributes(BOARD_ONLY)
+    fp.Reference().SetLayer(pcbnew.F_Fab); fp.Value().SetLayer(pcbnew.F_Fab)
+    fp.Reference().SetVisible(False); fp.Value().SetVisible(False)
+    mdl = pcbnew.FP_3DMODEL()
+    mdl.m_Filename = "${KIPRJMOD}/enclosure/" + fname
+    mdl.m_Show = show
+    fp.Models().push_back(mdl)
     board.Add(fp)
 
 # silkscreen notes

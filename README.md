@@ -28,6 +28,24 @@ Everything for this project lives in this one folder. There is one copy of each 
 | `pcb/fab/DRC_report.txt`, `ERC_report.txt` | Board and schematic check reports |
 | `pcb/renders/top.png`, `bottom.png` | 3D renders of the board |
 
+### Usability features on the board (converter values unchanged)
+
+| Feature | Where | What it is for |
+|---|---|---|
+| **HV LIVE** red LED (`D3`, `R26`–`R28`) | primary, left of centre | Lit while the bulk capacitor is charged. Do not touch the board until it goes out. Draws about 0.6 mA from the 400 V rail. |
+| **BIAS** yellow LED (`D4`, `R25`) | next to the 12 V header | Shows the controller supply is present. |
+| **OUTPUT ON** green LED (`D5`, `R24`) | secondary, lower right | Shows 54 V is present. Draws about 2 mA. |
+| Probe loops `TP1` VOUT, `TP2` RTN | secondary, lower right | Clip a multimeter or scope here to measure the output safely. |
+| Probe points `TP3` VCC, `TP4` PGND, `TP5` CS, `TP6` GATE | primary | Debug points. **These are on the live side: use an isolated or differential probe.** |
+| Silkscreen legends | at every connector, LED and test point | Polarity (`+400V`/`GND`, `+54V`/`RTN`), fuse rating, bias pin order, and a discharge warning. |
+| Rounded corners (3 mm) | board outline | Safer handling, easier fit in a case. |
+| Fiducials `FID1`–`FID3` | three corners | Alignment marks for machine assembly. |
+| Enclosure | `pcb/enclosure/` | 163 × 108 × 51 mm tray with stand-offs under the four M3 holes, wire openings at both terminal blocks and the bias header, and a flat lid. |
+
+Enclosure files: `ACF_enclosure_base.wrl` / `_lid.wrl` are what KiCad's 3D viewer shows; `ACF_enclosure_base.stl` / `_lid.stl` are the same shapes in millimetres for CAD or 3D printing. `gen_enclosure.py` creates them from the `ENC` settings in `design.py`.
+
+To see the enclosure in KiCad: open the board, press **Alt+3**. The base is shown; the lid is hidden so it does not cover the board. To show the lid, double-click footprint `ENC2` (select it via **Edit → Find**, search `ENC2`), go to the **3D Models** tab and tick **Show**. To hide the whole case, untick **Show** on `ENC1` the same way. The case outline is also drawn on the `User.Drawings` layer.
+
 ## 2. How to view everything
 
 ### LTspice simulation
@@ -106,3 +124,5 @@ If the router prints `FAILED` for a net, two parts are too close for the spacing
 - **Pin assumptions to check on datasheets:** LM5025 VIN tied to VCC for 12 V operation; TL431 pin order for the vendor you buy.
 - **The BOM has no manufacturer part numbers for passives**, and the placement file includes through-hole parts.
 - **Controller bias is an external 12 V header**, not an auxiliary winding.
+- **The enclosure is a concept model.** It is plain blocks: no screw holes in the stand-offs, no lid fixings, no vents, and its 38 mm inner height has not been checked against a real transformer. The STL files are overlapping solids and have not been test-printed. Choose a flame-rated insulating material for a 400 V product.
+- **The two indicator LEDs on the power rails add small loads** (about 0.6 mA at 400 V and 2 mA at 54 V); these were not added to the LTspice model.

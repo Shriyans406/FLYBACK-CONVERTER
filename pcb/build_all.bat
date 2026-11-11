@@ -7,6 +7,7 @@ set KPY="C:\Program Files\KiCad\10.0\bin\python.exe"
 set KCLI="C:\Program Files\KiCad\10.0\bin\kicad-cli.exe"
 if not exist fab\gerbers mkdir fab\gerbers
 if not exist renders mkdir renders
+python gen_enclosure.py || goto :err
 python gen_schematic.py || goto :err
 %KPY% build_1_place.py || goto :err
 python route.py || goto :err

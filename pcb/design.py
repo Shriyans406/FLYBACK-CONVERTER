@@ -13,12 +13,12 @@ HOLES = [(5, 5), (150, 5), (5, 95), (150, 95)]                    # M3 mounting 
 
 DOMAINS = {
     "PRI_LV": ["PGND", "AGND", "VCC", "OUTA", "OUTB", "G1", "CS", "CSF", "REF5", "RT",
-               "TIME", "SS", "COMP", "RAMP", "UVLO"],
-    "HVDC":   ["HV_IN", "HVDC", "UV1", "FF1"],
-    "HVMID":  ["UV2", "FF2", "BL1"],          # divider mid-points, <= 200 V
+               "TIME", "SS", "COMP", "RAMP", "UVLO", "LEDA", "LB"],
+    "HVDC":   ["HV_IN", "HVDC", "UV1", "FF1", "LH1"],
+    "HVMID":  ["UV2", "FF2", "BL1", "LH2"],          # divider mid-points, <= 200 V
     "SWD":    ["SW", "G2", "G2R", "VB"],
     "VCL":    ["VCL"],
-    "SEC":    ["SEC_A", "VOUT", "SGND", "FBM", "FB", "KA", "OPA", "CMP1"],
+    "SEC":    ["SEC_A", "VOUT", "SGND", "FBM", "FB", "KA", "OPA", "CMP1", "LO1"],
 }
 NET_DOMAIN = {n: d for d, ns in DOMAINS.items() for n in ns}
 
@@ -83,6 +83,9 @@ R0805 = ("Resistor_SMD", "R_0805_2012Metric")
 R1206 = ("Resistor_SMD", "R_1206_3216Metric")
 C0805 = ("Capacitor_SMD", "C_0805_2012Metric")
 TO2637 = ("Package_TO_SOT_SMD", "TO-263-7_TabPin8")
+LED0805 = ("LED_SMD", "LED_0805_2012Metric")
+TPLOOP = ("TestPoint", "TestPoint_Loop_D2.50mm_Drill1.0mm")
+TPPAD = ("TestPoint", "TestPoint_Pad_D2.0mm")
 
 # ref: (lib, footprint, value, anchor pad or None(=footprint origin), x, y, rotation, {pad: net}, description / part)
 PARTS = {
@@ -145,12 +148,27 @@ PARTS = {
  "R22":  (*R0805, "10k", None, 125, 80, 0, {"1": "FB", "2": "SGND"}, "feedback divider bottom"),
  "C16":  (*C0805, "100n", None, 116, 86, 0, {"1": "KA", "2": "CMP1"}, "Type-II compensation"),
  "R23":  (*R0805, "10k", None, 121.5, 86, 0, {"1": "CMP1", "2": "FB"}, "Type-II compensation"),
+ # ---- usability features (indicators and probe points; converter values unchanged) ----
+ "R26":  (*R1206, "220k", None, 31.5, 18.5, 90, {"2": "HVDC", "1": "LH1"}, "HV-live LED dropper"),
+ "R27":  (*R1206, "220k", None, 31.5, 30, 90, {"2": "LH1", "1": "LH2"}, "HV-live LED dropper"),
+ "R28":  (*R1206, "220k", None, 31.5, 41.5, 90, {"2": "LH2", "1": "LEDA"}, "HV-live LED dropper"),
+ "D3":   (*LED0805, "RED", None, 31.5, 48, 90, {"1": "PGND", "2": "LEDA"}, "HV LIVE indicator (bulk capacitor charged)"),
+ "R25":  (*R0805, "4k7", None, 9, 76.5, 0, {"1": "LB", "2": "VCC"}, "bias LED resistor"),
+ "D4":   (*LED0805, "YELLOW", None, 9, 72.5, 0, {"1": "PGND", "2": "LB"}, "12 V BIAS indicator"),
+ "R24":  (*R1206, "27k", None, 140, 72, 0, {"1": "VOUT", "2": "LO1"}, "output LED resistor"),
+ "D5":   (*LED0805, "GREEN", None, 140, 77, 0, {"1": "SGND", "2": "LO1"}, "OUTPUT ON indicator"),
+ "TP1":  (*TPLOOP, "VOUT", None, 144, 84, 0, {"1": "VOUT"}, "probe loop, +54 V output"),
+ "TP2":  (*TPLOOP, "SGND", None, 144, 90, 0, {"1": "SGND"}, "probe loop, output return"),
+ "TP3":  (*TPPAD, "VCC", None, 4.5, 78, 0, {"1": "VCC"}, "probe pad, 12 V bias (primary side)"),
+ "TP4":  (*TPLOOP, "PGND", None, 6, 62, 0, {"1": "PGND"}, "probe loop, primary ground"),
+ "TP5":  (*TPPAD, "CS", None, 75, 74, 0, {"1": "CS"}, "probe pad, current sense (primary side)"),
+ "TP6":  (*TPPAD, "GATE", None, 70, 74, 0, {"1": "G1"}, "probe pad, Q1 gate (primary side)"),
 }
 
 # Routing order: tight / critical nets first, long quiet ones last
 NET_ORDER = ["G2R", "VB", "G2", "SW", "G1", "CS", "OUTA", "OUTB", "CSF", "HV_IN", "HVDC", "BL1",
              "UV1", "UV2", "FF1", "FF2", "VCL", "REF5", "TIME", "RT", "SS", "UVLO", "RAMP", "VCC",
-             "SEC_A", "KA", "OPA", "FB", "FBM", "CMP1", "VOUT", "COMP", "AGND", "PGND", "SGND"]
+             "SEC_A", "KA", "OPA", "FB", "FBM", "CMP1", "LH1", "LH2", "LEDA", "LB", "LO1", "VOUT", "COMP", "AGND", "PGND", "SGND"]
 
 
 import uuid as _uuid
@@ -160,3 +178,24 @@ _NS = _uuid.UUID("6f1d7c2e-0000-4000-8000-00000000acf0")
 def sym_uuid(ref):
     """Stable ID shared by a schematic symbol and its PCB footprint (links the two files)."""
     return str(_uuid.uuid5(_NS, "sym" + ref))
+
+
+# ---------------------------------------------------------------- handling / assembly / enclosure
+CORNER_R = 3.0                                              # rounded board corners (mm)
+FIDUCIALS = [(11, 4), (139, 4), (11, 96)]                   # pick-and-place fiducials (board only)
+# Silkscreen legends: (text, x, y, size, justify) - "L" left, "C" centre
+SILK = [
+    ("+400V", 1.5, 7.9, 1.0, "L"), ("GND", 1.5, 21.6, 1.0, "L"),
+    ("+54V", 141.5, 7.9, 1.0, "L"), ("RTN", 141.5, 21.6, 1.0, "L"),
+    ("T1A 500V", 29.5, 7.2, 1.0, "L"),
+    ("12V BIAS  pin1 +  pin2 GND", 12.5, 85.3, 0.9, "L"),
+    ("HV LIVE", 33.6, 48, 1.0, "L"), ("BIAS", 11.2, 72.5, 1.0, "L"), ("OUTPUT ON", 142.4, 77, 1.0, "L"),
+    ("VOUT", 144, 81.4, 1.0, "C"), ("RTN", 140.2, 90, 1.0, "C"),
+    ("VCC", 2.2, 80.6, 0.9, "L"), ("PGND", 8.4, 62, 1.0, "L"),
+    ("CS", 75, 76.4, 0.9, "C"), ("GATE", 70, 76.4, 0.9, "C"),
+    ("DANGER: WAIT FOR THE HV LIVE LED TO GO OUT BEFORE TOUCHING", 48, 92.8, 1.0, "C"),
+    ("PRIMARY-SIDE TEST POINTS ARE LIVE - USE AN ISOLATED PROBE", 48, 94.6, 0.9, "C"),
+]
+# Enclosure (concept): board-local mm, z measured from the PCB top surface
+ENC = dict(gap=1.5, wall=2.5, floor=2.5, standoff=6.0, pcb=1.6, inner_h=38.0, lid=2.5,
+           openings=[("left", 4.0, 24.0, 15.0), ("right", 4.0, 24.0, 15.0), ("left", 80.0, 92.0, 11.0)])   # (wall, y0, y1, height)
